@@ -1,1 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOLO LEVELING | Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .energy-pulse-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -2;
+    pointer-events: none;
+    /* Centered radial gradient for the pulse with purple colors */
+    background: radial-gradient(circle at 60% 60%, #a259ff55 0%, #6be0ff22 40%, transparent 70%);
+    animation: energyPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes energyPulse {
+    0%, 100% {
+        opacity: 0.7;
+        filter: blur(0px) brightness(1);
+        background-size: 100% 100%;
+    }
+    50% {
+        opacity: 1;
+        filter: blur(8px) brightness(1.25);
+        background-size: 120% 120%;
+    }
+}
+
+        body {
+            background: #181b20;
+            color: #e0e6f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+        }
+        .dashboard-title {
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: #6be0ff;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 16px #1a1a2e;
+            font-weight: bold;
+            text-align: center;
+        }
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 0.8fr 1fr 0.8fr; /* Changed to 3 columns */
+            grid-gap: 24px;
+            background: rgba(24,28,36,0.98);
+            border-radius: 24px;
+            box-shadow: 0 0 32px #6be0ff33;
+            padding: 40px 36px 40px 36px;
+            max-width: 1200px; /* Increased max-width */
+            width: 100%;
+            margin: 0 auto 40px auto;
+        }
+        .profile-card {
+            background: #23253a;
+            border-radius: 18px;
+            box-shadow: 0 0 24px #6be0ff22;
+            padding: 32px 24px 24px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .avatar-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 16px;
+            box-shadow: 0 0 20px #a259ff77;
+            margin-bottom: 16px;
+            object-fit: cover;
+        }
+        .profile-info h2 {
+            font-size: 1.25em;
+            margin: 0 0 8px 0;
+            color: #6be0ff;
+            letter-spacing: 1px;
+        }
+        .profile-stats {
+            margin: 8px 0 0 0;
+            font-size: 1.05em;
+        }
+        .coins {
+            color: #ffe066;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .hp-bar {
+            margin: 10px 0 0 0;
+            font-size: 1em;
+            color: #ff6b81;
+        }
+        .hearts {
+            margin-left: 6px;
+            letter-spacing: 2px;
+        }
+        .logout-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(90deg, #6be0ff 0%, #a259ff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 0;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 24px;
+            box-shadow: 0 0 12px #6be0ff44;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #6be0ff 0%, #a259ff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 12px;
+            box-shadow: 0 0 12px #6be0ff44;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn:hover, .logout-btn:hover {
+            background: linear-gradient(90deg, #a259ff 0%, #6be0ff 100%);
+        }
+        .button-container {
+            grid-column: 1 / 4; /* Span across all columns */
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .skills-section {
+            background: #20222f;
+            border-radius: 18px;
+            padding: 18px 24px;
+            box-shadow: 0 0 12px #6be0ff33;
+            height: 100%;
+        }
+        .skills-section h3 {
+            color: #a259ff;
+            margin-bottom: 18px;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+        .skill-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .skill-label {
+            width: 90px;
+            color: #a259ff;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        .skill-points {
+            display: flex;
+            gap: 2px;
+            margin-right: 14px;
+        }
+        .point-filled, .point-empty {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: #23232b;
+            border: 1px solid #333;
+        }
+        .point-filled {
+            background: linear-gradient(90deg, #6be0ff 0%, #a259ff 100%);
+            box-shadow: 0 0 6px #6be0ff77;
+            border: none;
+        }
+        .skill-xp {
+            font-size: 0.98em;
+            color: #e0e6f0;
+            width: 90px;
+        }
+        .radar-box {
+            background: #20222f;
+            border-radius: 18px;
+            padding: 16px 0 0 0;
+            box-shadow: 0 0 12px #6be0ff33;
+            text-align: center;
+            min-height: 300px;
+            margin-bottom: 24px;
+        }
+        .habits-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .calendar-section, .xp-section {
+            background: #20222f;
+            border-radius: 18px;
+            padding: 18px 24px;
+            box-shadow: 0 0 12px #6be0ff33;
+        }
+        .calendar-section h4 {
+            color: #6be0ff;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            color: #e0e6f0;
+        }
+        .calendar th, .calendar td {
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 0.97em;
+        }
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOLO LEVELING | Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background: #181b20;
+            color: #e0e6f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+
+        }
+        .dashboard-title {
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: #6be0ff;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 16px #1a1a2e;
+            font-weight: bold;
+            text-align: center;
+        }
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(24,28,36,0.7);
+            border-radius: 24px;
+            box-shadow: 0 0 32px #6be0ff33;
+            padding: 40px 36px 40px 36px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto 40px auto;
+
+        }
+        .dashboard-top-row {
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            width: 100%;
+        }
+        .dashboard-top-row > .profile-section {
+            min-width: 320px;
+            max-width: 350px;
+            flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dashboard-top-row > .skills-section {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        .dashboard-bottom-row {
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            width: 100%;
+            margin-top: 24px;
+        }
+        .dashboard-bottom-row > .habits-container {
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            width: 100%;
+        }
+        .dashboard-bottom-row .radar-box,
+        .dashboard-bottom-row .calendar-section,
+        .dashboard-bottom-row .xp-section {
+            flex: 1 1 0;
+            min-width: 220px;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+            gap: 24px;
+        }
+        @media (max-width: 1200px) {
+            .dashboard-top-row, .dashboard-bottom-row, .dashboard-bottom-row > .habits-container {
+                flex-direction: column;
+                gap: 24px;
+            }
+            .dashboard-top-row > .profile-section {
+                max-width: 100%;
+                min-width: 0;
+                flex: 1 1 0;
+            }
+        }
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 12px 2vw;
+            }
+        }
+
+        body {
+                opacity: 0;
+                transform: scale(0.96);
+                transition: opacity 0.6s cubic-bezier(.77,0,.18,1), transform 0.6s cubic-bezier(.77,0,.18,1);
+             }
+        body.page-loaded {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+    </style>
+</head>
+<body>
+    <div class="energy-pulse-bg"></div>
+
+    <div class="dashboard-title">SOLO LEVELING HABIT TRACKER</div>
+    <div class="dashboard-container">
+
+        <!-- Top Row: Profile (left) and Skills (center) side by side -->
+        <div class="dashboard-top-row">
+            <!-- Profile Section (Left) -->
+            <div class="profile-section">
+                <div class="profile-card">
+                    <img src="{{ url_for('static', filename='images/avtar.jpg') }}" class="avatar-img" alt="Avatar">
+                    <div class="profile-info">
+                        <h2>{{ user.username }}</h2>
+                        <div class="profile-stats">
+                            Level {{ user.level }} <span class="coins">&bull; {{ user.coins }} Coins</span>
+                        </div>
+                        <div class="hp-bar">
+                            HP: {{ user.hp }} / 1000
+                            <span class="hearts">
+                                {% for i in range(user.hp // 100) %}
+                                    <span>♥</span>
+                                {% endfor %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+
+            <!-- Skills Section (Center, next to Profile) -->
+            <div class="skills-section">
+                <h3>Skill Points</h3>
+                {% for skill in skills %}
+                    <div class="skill-row">
+                        <div class="skill-label">{{ skill.name }}</div>
+                        <div class="skill-points">
+                            {% set filled = (skill.points // 50) %}
+                            {% for i in range(filled) %}
+                                <span class="point-filled"></span>
+                            {% endfor %}
+                            {% for i in range(10-filled) %}
+                                <span class="point-empty"></span>
+                            {% endfor %}
+                        </div>
+                        <div class="skill-xp">{{ skill.points }} / {{ skill.max_points }} &nbsp; LV {{ skill.level }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Bottom Row: Habits container (radar, calendar, xp) in a horizontal row below -->
+        <div class="dashboard-bottom-row">
+            <div class="habits-container">
+                <div class="radar-box">
+                    <canvas id="statsRadar" width="280" height="260"></canvas>
+                </div>
+                <div class="calendar-section">
+                    <h4>Progress -</h4>
+                    <table class="calendar">
+                        <tr>
+                            <th>Wk</th>
+                            <th>M</th>
+                            <th>T</th>
+                            <th>W</th>
+                            <th>T</th>
+                            <th>F</th>
+                            <th>S</th>
+                            <th>S</th>
+                        </tr>
+                        {% for week in calendar %}
+                        <tr>
+                            <td>w-{{ week.number }}</td>
+                            {% for day in week.days %}
+                                <td class="{% if day.completed %}completed{% endif %}"></td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="xp-section">
+                    <div class="goal-completion">
+                        Goal Completion: {{ goal_completion if goal_completion else "0" }}%
+                    </div>
+                    <div class="xp-bar" style="position:relative;">
+                        <div class="xp-bar-inner" style="width: {{ (user.xp/2000)*100 }}%"></div>
+                        <span class="xp-text">{{ user.xp }} / 2000</span>
+                    </div>
+                    <div style="margin-top:8px; color:#a259ff;">Level UP:</div>
+                    <div class="level-up-indicator">
+                        {% for i in range(user.level) %}
+                            <span class="level-dot filled"></span>
+                        {% endfor %}
+                        {% for i in range(10-user.level) %}
+                            <span class="level-dot"></span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons at the bottom center -->
+        <div class="button-container">
+            <a href="{{ url_for('stats') }}" class="btn">View Stats</a>
+            <a href="{{ url_for('habits') }}" class="btn">Track Habits</a>
+        </div>
+    </div>
+
+    <script>
+        // Radar chart data from backend
+        const radarLabels = [{% for skill in skills %}"{{ skill.name }}",{% endfor %}];
+        const radarData = [{% for skill in skills %}{{ skill.level }},{% endfor %}];
+    </script>
+    <script src="{{ url_for('static', filename='js/radar.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.body.classList.add('page-loaded');
+        });
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Fade in on page load
+    document.body.style.opacity = 0;
+    setTimeout(function() {
+        document.body.style.transition = "opacity 0.5s cubic-bezier(.77,0,.18,1)";
+        document.body.style.opacity = 1;
+    }, 50);
+
+    // Fade out on navigation for all internal links
+    document.querySelectorAll('a').forEach(function(link) {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !link.hasAttribute('target')) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 500); // Match transition duration
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>
+
 
