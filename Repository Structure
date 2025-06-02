@@ -1,0 +1,22 @@
+Habit-Tracker-Solo-Leveling-Themed/
+├── app.py
+├── requirements.txt
+├── database.db
+├── templates/
+│   ├── base.html
+│   ├── dashboard.html
+│   ├── login.html
+│   ├── register.html
+│   ├── habits.html
+│   └── stats.html
+│── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   ├── script.js
+│   │   └── color_toggle.js
+│   └── images/
+│       ├── avtar.jpg
+│       └── sungjinwoo.jpg
+└── instance/
+    └── database.db
