@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Solo Leveling Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/color_toggle.js') }}" defer></script>
+    <style>
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: #0d0d0d;
+    }
+    body {
+        background-color: #0d0d0d;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+        transition: transform 1s ease, font-size 1s ease;
+    }
+    #typing-text {
+        color: #3498db;
+        font-size: 3rem;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 2px solid #3498db;
+    }
+    .shrink {
+        transform: scale(0.6) translateY(-100px);
+    }
+    .character-image {
+        margin: 20px 0;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
+    .character-image img {
+        width: 300px;
+        height: auto;
+        filter: drop-shadow(0 0 10px #3498db);
+    }
+    .subtext {
+        color: #aaa;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
+    .register-form {
+        background: rgba(26, 26, 60, 0.8);
+        padding: 30px;
+        border: 2px solid #00bfff;
+        border-radius: 10px;
+        box-shadow: 0 0 15px #00bfff, 0 0 30px #001f33 inset;
+        width: 320px;
+        text-align: center;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.8s ease;
+    }
+    .register-form.show {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .register-form input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-bottom: 2px solid #3498db;
+        background: transparent;
+        color: white;
+        outline: none;
+    }
+    .register-form input::placeholder {
+        color: #bbb;
+    }
+    .register-form button {
+        width: 100%;
+        padding: 10px;
+        background-color: #3498db;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: background-color 0.3s;
+    }
+    .register-form button:hover {
+        background-color: #5dade2;
+    }
+    .login-link {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+    .login-link a {
+        color: #00bfff;
+        text-decoration: none;
+    }
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+    </style>
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="header" id="header">
+    <h1 id="typing-text"></h1>
+    <div class="character-image" id="character-image">
+        <img src="{{ url_for('static', filename='images/sungjinwoo.jpg') }}" alt="Sung Jin-Woo">
+    </div>
+    <p class="subtext" id="subtext">Habit Tracker - Level Up IRL</p>
+</div>
+
+<div class="register-form" id="register-form">
+    <form method="POST" action="/register">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Register</button>
+    </form>
+    <div class="login-link">
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 80 },
+        "color": { "value": "#00bfff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3 },
+        "move": { "speed": 2 }
+    },
+    "background": { "color": "#0d0d0d" }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Typing effect
+    const text = "SOLO LEVELING";
+    const typingText = document.getElementById('typing-text');
+    const header = document.getElementById('header');
+    const registerForm = document.getElementById('register-form');
+    const characterImage = document.getElementById('character-image');
+    const subtext = document.getElementById('subtext');
+
+    let index = 0;
+
+    function typeLetter() {
+        if (index < text.length) {
+            typingText.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeLetter, 150);
+        } else {
+            // After typing
+            setTimeout(() => {
+                typingText.classList.add('shrink');
+                characterImage.style.opacity = 1;
+                subtext.style.opacity = 1;
+
+                setTimeout(() => {
+                    registerForm.classList.add('show');
+                }, 1000); // Show register after everything
+            }, 800);
+        }
+    }
+
+    typeLetter();
+
+    // Fade in page
+    document.body.style.opacity = 0;
+    setTimeout(() => {
+        document.body.style.transition = "opacity 0.5s";
+        document.body.style.opacity = 1;
+    }, 100);
+
+    // Smooth page exit
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            document.body.style.opacity = 0;
+            setTimeout(() => {
+                window.location.href = href;
+            }, 500);
+        });
+    });
+});
+</script>
+</body>
+</html>

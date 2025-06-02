@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solo Leveling | Habits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Habits</h2>
+        <form method="POST">
+            <input type="text" name="name" placeholder="Habit Name" required>
+            <input type="text" name="description" placeholder="Description" required>
+            <input type="text" name="frequency" placeholder="Frequency (e.g. Daily, Weekly)" required>
+            <div class="form-buttons">
+                <button type="submit">Add Habit</button>
+            </div>
+        </form>
+        <ul>
+            {% for habit in habits %}
+            <li>
+                <strong>{{ habit.name }}</strong> - {{ habit.description }} ({{ habit.frequency }}) - Completed: {{ habit.completions }}
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="form-buttons">
+            <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Fade in on page load
+    document.body.style.opacity = 0;
+    setTimeout(function() {
+        document.body.style.transition = "opacity 0.5s cubic-bezier(.77,0,.18,1)";
+        document.body.style.opacity = 1;
+    }, 50);
+
+    // Fade out on navigation for all internal links
+    document.querySelectorAll('a').forEach(function(link) {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !link.hasAttribute('target')) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 500); // Match transition duration
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>

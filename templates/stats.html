@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solo Leveling | Stats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Stats</h2>
+        <canvas id="statsRadar" width="300" height="300"></canvas>
+        <div class="button-container">
+            <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+    <script>
+        const radarLabels = [{% for skill in skills %}"{{ skill.name }}",{% endfor %}];
+        const radarData = [{% for skill in skills %}{{ skill.level }},{% endfor %}];
+    </script>
+    <script src="{{ url_for('static', filename='js/radar.js') }}"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Fade in on page load
+    document.body.style.opacity = 0;
+    setTimeout(function() {
+        document.body.style.transition = "opacity 0.5s cubic-bezier(.77,0,.18,1)";
+        document.body.style.opacity = 1;
+    }, 50);
+
+    // Fade out on navigation for all internal links
+    document.querySelectorAll('a').forEach(function(link) {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !link.hasAttribute('target')) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 500); // Match transition duration
+            });
+        }
+    });
+});
+</script>
+
+</body>
+</html>

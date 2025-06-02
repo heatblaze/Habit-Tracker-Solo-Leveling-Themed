@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Solo Leveling Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/color_toggle.js') }}" defer></script>
+    <style>
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: #0d0d0d;
+    }
+
+    body {
+        background-color: #0d0d0d;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        opacity: 1;
+        transition: opacity 0.5s cubic-bezier(.77,0,.18,1);
+    }
+    body.fade-out {
+        opacity: 0;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+        transition: transform 1s ease, font-size 1s ease;
+    }
+
+    #typing-text {
+        color: #3498db;
+        font-size: 5rem;
+        margin-top: 60px;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: none;
+        display: inline-block;
+        transition: transform 0.8s cubic-bezier(.77,0,.18,1), font-size 0.8s cubic-bezier(.77,0,.18,1);
+    }
+
+    /* Blinking cursor */
+    .blinking-cursor {
+        display: inline-block;
+        width: 1ch;
+        color: #3498db;
+        font-weight: bold;
+        animation: blink 0.8s steps(1) infinite;
+    }
+    @keyframes blink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+    }
+
+    /* Shrink and move up animation */
+    .shrink-move-up {
+        transform: scale(0.6) translateY(-100px) !important;
+        transition: transform 0.8s cubic-bezier(.77,0,.18,1), font-size 0.8s cubic-bezier(.77,0,.18,1);
+    }
+
+    .character-image {
+        margin: -40px 0 20px 0;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
+
+    .character-image img {
+        width: 300px;
+        height: auto;
+        filter: drop-shadow(0 0 10px #3498db);
+    }
+
+    .subtext {
+        color: #aaa;
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
+
+    .login-form {
+        background: rgba(26, 26, 60, 0.8);
+        padding: 30px;
+        border: 2px solid #00bfff;
+        border-radius: 10px;
+        box-shadow: 0 0 15px #00bfff, 0 0 30px #001f33 inset;
+        width: 320px;
+        text-align: center;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.8s ease;
+    }
+
+    .login-form.show {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .login-form input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        border-bottom: 2px solid #3498db;
+        background: transparent;
+        color: white;
+        outline: none;
+    }
+
+    .login-form input::placeholder {
+        color: #bbb;
+    }
+
+    .login-form button {
+        width: 100%;
+        padding: 10px;
+        background-color: #3498db;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: background-color 0.3s;
+    }
+
+    .login-form button:hover {
+        background-color: #5dade2;
+    }
+
+    .register-link {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+
+    .register-link a {
+        color: #00bfff;
+        text-decoration: none;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+    </style>
+</head>
+<body>
+<div id="particles-js"></div>
+
+<div class="header" id="header">
+    <h1 id="typing-text"><span id="typed-text"></span><span id="cursor" class="blinking-cursor">|</span></h1>
+    <div class="character-image" id="character-image">
+        <img src="{{ url_for('static', filename='images/sungjinwoo.jpg') }}" alt="Sung Jin-Woo">
+    </div>
+    <p class="subtext" id="subtext">Habit Tracker - Level Up IRL</p>
+</div>
+
+<div class="login-form" id="login-form">
+    <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="register-link">
+        <p>Don't have an account? <a href="/register">Register</a></p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 80 },
+        "color": { "value": "#00bfff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3 },
+        "move": { "speed": 2 }
+    },
+    "background": { "color": "#0d0d0d" }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Typing effect with blinking cursor and shrink/move up
+    const text = "SOLO LEVELING";
+    const typedText = document.getElementById('typed-text');
+    const cursor = document.getElementById('cursor');
+    const typingText = document.getElementById('typing-text');
+    const header = document.getElementById('header');
+    const loginForm = document.getElementById('login-form');
+    const characterImage = document.getElementById('character-image');
+    const subtext = document.getElementById('subtext');
+
+    let index = 0;
+
+    function typeLetter() {
+        if (index < text.length) {
+            typedText.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeLetter, 150);
+        } else {
+            // After typing
+            setTimeout(() => {
+                typingText.classList.add('shrink-move-up');
+                setTimeout(() => {
+                    cursor.style.display = "none";
+                }, 800);
+
+                characterImage.style.opacity = 1;
+                subtext.style.opacity = 1;
+
+                setTimeout(() => {
+                    loginForm.classList.add('show');
+                }, 1000);
+            }, 800);
+        }
+    }
+
+    typeLetter();
+
+    // Fade in page
+    document.body.style.opacity = 0;
+    setTimeout(() => {
+        document.body.style.transition = "opacity 0.5s cubic-bezier(.77,0,.18,1)";
+        document.body.style.opacity = 1;
+    }, 50);
+
+    // Smooth fade transition for all internal links (including Login/Register)
+    document.querySelectorAll('a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !link.hasAttribute('target')) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            });
+        }
+    });
+
+    // Fade transition on login submit (Login -> Dashboard)
+    const loginFormEl = document.querySelector("#login-form form");
+    if (loginFormEl) {
+        loginFormEl.addEventListener("submit", function(e) {
+            e.preventDefault();
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+                loginFormEl.submit();
+            }, 500); // Match CSS transition duration
+        });
+    }
+});
+</script>
+
+</body>
+</html>
